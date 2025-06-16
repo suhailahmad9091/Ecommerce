@@ -1,0 +1,99 @@
+# Submit a review and rating
+func SubmitReview():
+    // Step 1: Parse request body
+    if error while parsing:
+        return 400 Bad Request
+
+    // Step 2: Validate rating and product_id
+    if invalid rating or missing product_id:
+        return 400 Invalid Input
+
+    // Step 3: Insert review into reviews table
+    saveReview(userID, productID, rating, reviewText)
+
+    // Step 4: Return success response
+    return 201 Created with message "Review submitted"
+
+
+
+
+
+# Get all reviews for a product
+func GetProductReviews(productID):
+    // Step 1: Validate productID
+    if invalid:
+        return 400 Bad Request
+
+    // Step 2: Fetch reviews from DB
+    reviews = fetchReviewsByProductID(productID)
+
+    // Step 3: Return reviews
+    return 200 OK with reviews
+
+
+
+
+
+# Get current user's reviews
+func GetUserReviews():
+    // Step 1: Extract userID from context
+    if userID missing:
+        return 401 Unauthorized
+
+    // Step 2: Fetch reviews from DB
+    reviews = fetchReviewsByUserID(userID)
+
+    // Step 3: Return user's reviews
+    return 200 OK with reviews
+
+
+
+
+
+# Update a review
+func UpdateReview(reviewID):
+    // Step 1: Parse request body
+    if error while parsing:
+        return 400 Bad Request
+
+    // Step 2: Fetch review and verify ownership
+        if review not found or userID mismatch:
+            return 403 Forbidden
+
+    // Step 3: Update review in DB
+    updateReview(reviewID, newRating, newReviewText)
+
+    // Step 4: Return success response
+    return 200 OK with message "Review updated"
+
+
+
+
+
+# Delete a review
+func DeleteReview(reviewID):
+    // Step 1: Fetch review and verify ownership
+    if review not found or userID mismatch:
+        return 403 Forbidden
+
+    // Step 2: Delete review from DB
+    deleteReview(reviewID)
+
+    // Step 3: Return success response
+    return 200 OK with message "Review deleted"
+
+
+
+
+
+# Get average rating and count
+func GetProductRatingSummary(productID):
+    // Step 1: Validate productID
+    if invalid:
+        return 400 Bad Request
+
+    // Step 2: Aggregate average rating and count
+    data = calculateAverageRating(productID)
+
+    // Step 3: Return rating summary
+    return 200 OK with { average_rating, total_reviews }

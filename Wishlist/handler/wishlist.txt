@@ -1,0 +1,58 @@
+# Add products to wishlist
+func AddToWishlist():
+    // Step 1: Parse request body
+    if error while parsing:
+        return 400 Bad Request
+
+    // Step 2: Add to wishlist table
+    saveWishlist(userID, productID)
+
+    // Step 3: Return success response
+    return 201 Created with message "Added to wishlist"
+
+
+
+
+
+# Get current user’s wishlist
+func GetWishlist():
+    // Step 1: Extract userID from context
+    if userID not found:
+        return 401 Unauthorized
+
+    // Step 2: Fetch wishlist items for userID
+    wishlist = fetchWishlistByUserID(userID)
+
+    // Step 3: Return wishlist data
+    return 200 OK with wishlist
+
+
+
+
+# Remove product from wishlist
+func RemoveFromWishlist(productID):
+    // Step 1: Extract userID from context
+    if userID not found:
+        return 401 Unauthorized
+
+    // Step 2: Delete product from wishlist table
+    deleteWishlistItem(userID, productID)
+
+    // Step 3: Return success response
+    return 200 OK with message "Item removed from wishlist"
+
+
+
+
+
+# Delete all items from wishlist
+func ClearWishlist():
+    // Step 1: Extract userID from context
+    if userID not found:
+        return 401 Unauthorized
+
+    // Step 2: Delete all wishlist items for userID
+    clearWishlistByUserID(userID)
+
+    // Step 3: Return success response
+    return 200 OK with message "Wishlist cleared"

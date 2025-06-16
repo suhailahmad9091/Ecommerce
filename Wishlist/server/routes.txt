@@ -1,0 +1,7 @@
+# Wishlist Routes
+
+Method        	Endpoint	                          Description
+POST	        /wishlist	                          Add product to wishlist
+GET	            /wishlist	                          Get current user’s wishlist
+DELETE	        /wishlist/{productId}	              Remove product from wishlist
+DELETE	        /wishlist/clear                       Delete all items from wishlist

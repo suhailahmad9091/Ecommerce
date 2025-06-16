@@ -1,0 +1,9 @@
+# Wishlist Routes
+
+Method        	Endpoint	                        Description
+POST            /reviews                            Submit a review and rating
+GET             /reviews/product/{productId}        Get all reviews for a product
+GET             /reviews/user                       Get current user's reviews
+PUT             /reviews/{reviewId}                 Update a review
+DELETE          /reviews/{reviewId}                 Delete a review
+GET             /ratings/product/{productId}        Get average rating and count
