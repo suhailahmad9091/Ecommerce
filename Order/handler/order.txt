@@ -1,0 +1,126 @@
+# Place a new order
+func CreateOrder():
+    // Step 1: Parse request body (cart_items, shipping_address, payment_mode)
+    if error while parsing:
+        return 400 Bad Request
+
+    // Step 2: Create order record in DB with status "pending"
+    orderID = saveOrder(userID, items, shippingAddress, paymentMode)
+
+    // Step 4: Publish Kafka event to notify payment/inventory services
+    publishEvent("order.placed", {
+            order_id: orderID,
+            user_id: userID,
+            items: items,
+            shipping_address: shippingAddress,
+            payment_mode: paymentMode
+        })
+
+    // Step 5: Return success response
+    return 201 Created with message "Order placed", order_id
+
+
+
+
+
+# Get current user's orders
+func GetUserOrders():
+    // Step 1: Extract userID from context
+    if userID missing:
+        return 401 Unauthorized
+
+    // Step 2: Fetch orders from DB
+    orders = fetchOrdersByUserID(userID)
+
+    // Step 3: Return success response
+    return 200 OK with orders
+
+
+
+
+
+# Get specific order details
+func GetOrderDetails(orderID):
+    // Step 1: Extract userID from context
+        if userID missing:
+            return 401 Unauthorized
+
+    // Step 2: Fetch order from DB using orderID
+        order = fetchOrderByID(orderID)
+        if order not found:
+            return 404 Not Found
+
+    // Step 3: Check if the order belongs to the user
+        if order.userID != userID:
+            return 403 Forbidden
+
+    // Step 2: Return success response
+    return 200 OK with order details
+
+
+
+
+
+# Cancel an order
+func CancelOrder(orderID):
+    // Step 1: Extract userID and verify order ownership
+    if not owned by user:
+        return 403 Forbidden
+
+    // Step 2: Check if order status is cancellable
+    if status is not pending/processing:
+        return 400 Bad Request
+
+    // Step 3: Update order status to "cancelled"
+    updateOrderStatus(orderID, "cancelled")
+
+    // Step 4: Publish Kafka event to notify inventory/payment services
+    publishEvent("order.cancelled", {
+        order_id: orderID,
+        user_id: userID
+    })
+
+    // Step 5: Return success response
+    return 200 OK with message "Order cancelled"
+
+
+
+
+
+# Update order status
+func UpdateOrderStatus(orderID):
+    // Step 1: Validate admin or internal system access
+    if not authorized:
+        return 403 Forbidden
+
+    // Step 2: Parse new status from request body
+    if invalid status:
+        return 400 Bad Request
+
+    // Step 3: Update order status in DB
+    updateOrderStatus(orderID, newStatus)
+
+    // Step 4: Publish Kafka event for status change
+    publishEvent("order.status_updated", {
+        order_id: orderID,
+        status: newStatus
+    })
+
+    // Step 5: Return success response
+    return 200 OK with message "Order status updated"
+
+
+
+
+
+# Delete order
+func DeleteOrder(orderID):
+    // Step 1: Verify user or admin rights
+    if not authorized:
+        return 403 Forbidden
+
+    // Step 2: Soft delete order in DB
+    softDeleteOrder(orderID)
+
+    // Step 3: Return success response
+    return 200 OK with message "Order deleted"

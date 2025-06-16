@@ -1,0 +1,41 @@
+# Create a new payment
+func CreatePayment(orderID, userID):
+    // Step 1: Validate payment method, amount, etc.
+    if !validPaymentData():
+        return 400 Bad Request
+
+    // Step 2: Create the payment record with "initiated" status
+    paymentID = createPayment(orderID, userID, "initiated")
+
+    // Step 4: Initiate transaction with payment gateway
+    triggerPaymentGateway(paymentID)
+
+    // Step 5: Return success response
+    return 201 Created with paymentID
+
+
+
+
+
+# Get specific payment details
+func GetPaymentByID(paymentID):
+    // Step 1: Fetch payment details using paymentID
+
+    // Step 2: Return payment details
+    return 200 OK with payment
+
+
+
+
+
+# Retry a failed payment
+func RetryPayment(paymentID):
+    // Step 1: Check payment status is "failed"
+    if not isFailed(paymentID):
+        return 400 Bad Request
+
+    // Step 2: Trigger payment retry logic
+    triggerPaymentGateway(paymentID)
+
+    // Step 3: Return response
+    return 200 OK with message "Retry initiated"

@@ -1,4 +1,4 @@
-# Wishlist Routes
+# Review and Rating Routes
 
 Method        	Endpoint	                        Description
 POST            /reviews                            Submit a review and rating
