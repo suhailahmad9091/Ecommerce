@@ -1,0 +1,54 @@
+GET /api/inventory/{productId} – Check Product Availability
+
+function getProductStock(productId) {
+  // 1. Validate product exists (call Product Service)
+  if (!ProductService.exists(productId)) {
+    throw Error("Product not found")
+  }
+
+  // 2. Get physical stock from Inventory DB
+  physicalStock = InventoryDB.getStock(productId)
+
+  // 3. Get reserved stock (call Order Service)
+  reservedStock = OrderService.getReservedStock(productId)
+
+  // 4. Calculate available stock
+  availableStock = physicalStock - reservedStock
+
+  return {
+    productId: productId,
+    inStock: availableStock > 0,
+    quantity: availableStock
+  }
+}
+
+POST /api/inventory/check – Bulk Availability Check
+function bulkCheckStock(productIds) {
+  // 1. Get physical stock for all products
+  physicalStockMap = InventoryDB.getBulkStock(productIds)
+
+  // 2. Get reserved stock for all (call Order Service)
+  reservedStockMap = OrderService.getBulkReservedStock(productIds)
+
+  // 3. Combine results
+  return productIds.map(id => ({
+    productId: id,
+    inStock: (physicalStockMap[id] - reservedStockMap[id]) > 0,
+    quantity: physicalStockMap[id] - reservedStockMap[id]
+  }))
+}
+
+PUT /api/inventory/{productId} – Update Stock (Admin)
+function updateStock(productId, adjustment, reason) {
+  // 2. Update in Inventory DB
+  newStock = InventoryDB.adjustStock(
+    productId: productId
+  )
+
+  // 3. If stock went from 0→positive, notify waitlist (call Notification Service)
+  if (reason == "RESTOCK" && newStock == adjustment) {
+    NotificationService.notifyBackInStock(productId)
+  }
+
+  return { newStock: newStock }
+}

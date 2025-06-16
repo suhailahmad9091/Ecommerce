@@ -1,0 +1,68 @@
+ GET /api/products - List Products
+
+function getProducts(page, limit, filters) {
+  // 1. Get products from Product DB (with filters/pagination)
+  products = ProductDB.query(page, limit, filters)
+  
+  // 2. Get inventory status for each product (call Inventory Service)
+  productIds = products.map(p => p.id)
+  inventoryStatus = InventoryService.getBulkStatus(productIds)
+  
+  
+  // 4. Combine data
+  return products.map(product => ({
+    ...product,
+    inStock: inventoryStatus[product.id]
+  }))
+}
+
+
+GET /api/products/{id} 
+function getProductDetails(productId) {
+  // 1. Get base product info
+  product = ProductDB.get(productId)
+  
+  // 2. Get inventory (call Inventory Service)
+  stock = InventoryService.getStatus(productId)
+  
+  // 3. Get promotions (call Promotion Service)
+  discount = PromotionService.getProductDiscount(productId)
+  
+  
+  return {
+    ...product,
+    inStock: stock,
+    currentPrice: product.price * (1 - discount)
+  }
+}
+
+ POST /api/products - Create Product (Admin)
+ function createProduct(productData) {
+  // 1. Validate admin permissions
+  if (!user.isAdmin) throw Error("Unauthorized")
+  
+  // 2. Create in Product DB
+  newProduct = ProductDB.create(productData)
+  
+  // 3. Initialize inventory (call Inventory Service)
+  InventoryService.initializeStock(
+    productId: newProduct.id,
+    initialStock: productData.initialStock || 0
+  )
+  
+  return newProduct
+}
+
+GET /api/products/search - Product Search
+function searchProducts(query, filters) {
+  // 1. Search in Product DB (full-text search)
+  results = ProductDB.search(query, filters)
+  
+  // 2. Filter out-of-stock if requested (call Inventory Service)
+  if (filters.inStockOnly) {
+    inventoryStatus = InventoryService.getBulkStatus(results.map(r => r.id))
+    results = results.filter(product => inventoryStatus[product.id] > 0)
+  }
+  
+  return results
+}
