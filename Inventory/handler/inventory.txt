@@ -52,3 +52,28 @@ function updateStock(productId, adjustment, reason) {
 
   return { newStock: newStock }
 }
+
+Internal: POST /api/inventory/reserve (Called by Order Service)
+Purpose: Temporarily reserve stock during checkout
+Calls: None (updates internal reservation system)
+
+function reserveStock(items) {
+  // 1. Check physical availability
+  items.forEach(item => {
+    available = InventoryDB.getStock(item.productId) - getReserved(item.productId)
+    if (available < item.quantity) {
+      throw Error("Insufficient stock for ${item.productId}")
+    }
+  })
+
+  // 2. Create reservations
+  reservations = items.map(item => 
+    ReservationSystem.create(
+      productId: item.productId,
+      quantity: item.quantity,
+      expiresAt: now() + 2.minutes // Hold for checkout
+    )
+  )
+
+  return { success: true, reservationIds: reservations.map(r => r.id) }
+}
