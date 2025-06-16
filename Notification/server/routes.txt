@@ -1,0 +1,8 @@
+# Notification Routes
+
+Method         	 Endpoint	                Description
+POST	        /notifications/send	        Send a notification to a user
+GET	            /notifications	            Get all notifications for current user
+PUT	            /notifications/{id}/read	Mark a notification as read
+DELETE	        /notifications/{id}	        Delete a notification
+DELETE	        /notifications/clear	    Clear all notifications for user

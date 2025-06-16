@@ -1,0 +1,93 @@
+# Send a notification to a user
+func SendNotification():
+    // Step 1: Parse request body
+    if error while parsing:
+        return 400 Bad Request
+
+    // Step 2: Validate input (user_id, type, message)
+    if missing required fields:
+        return 400 Invalid Input
+
+    // Step 3: Save notification in DB
+    saveNotification(userID, type, message)
+
+    // Step 4: publish Kafka event or trigger email/SMS
+    publishEvent("notification.send", {
+            user_id: userID,
+            type: type,
+            message: message
+        })
+
+    // Step 5: Return success response
+    return 201 Created with message "Notification sent"
+
+
+
+
+# Get all notifications for current user
+func GetUserNotifications():
+    // Step 1: Extract userID from context
+    if userID missing:
+        return 401 Unauthorized
+
+    // Step 2: Fetch notifications from DB
+    notifications = fetchNotificationsByUserID(userID)
+
+    // Step 3: Return notifications
+    return 200 OK with notifications
+
+
+
+
+
+# Mark a notification as read
+func MarkNotificationAsRead(notificationID):
+    // Step 1: Extract userID from context
+    if userID missing:
+            return 401 Unauthorized
+
+    // Step 2: Verify notification ownership
+    if not owned by user:
+        return 403 Forbidden
+
+    // Step 3: Update notification status
+    markAsRead(notificationID)
+
+    // Step 4: Return success response
+    return 200 OK with message "Notification marked as read"
+
+
+
+
+
+# Delete a notification
+func DeleteNotification(notificationID):
+    // Step 1: Extract userID from context
+    if userID missing:
+            return 401 Unauthorized
+
+    // Step 2: Verify notification ownership
+    if not owned by user:
+        return 403 Forbidden
+
+    // Step 3: Delete notification from DB
+    deleteNotification(notificationID)
+
+    // Step 4: Return success response
+    return 200 OK with message "Notification deleted"
+
+
+
+
+
+# Clear all notifications for user
+func ClearNotifications():
+    // Step 1: Extract userID from context
+    if userID missing:
+            return 401 Unauthorized
+
+    // Step 2: Delete all notifications where user_id = userID
+    clearNotificationsByUser(userID)
+
+    // Step 3: Return success response
+    return 200 OK with message "All notifications cleared"
