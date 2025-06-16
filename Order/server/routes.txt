@@ -1,0 +1,9 @@
+# Order Routes
+
+Method         	Endpoint	                Description
+POST	        /orders	                    Place a new order
+GET         	/orders	                    Get current user's orders
+GET	            /orders/{orderId}	        Get specific order details
+PUT	            /orders/{orderId}/cancel	Cancel an order
+PUT	            /orders/{orderId}/status	Update order status
+DELETE	        /orders/{orderId}	        Delete order
