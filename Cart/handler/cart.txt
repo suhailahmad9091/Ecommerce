@@ -1,0 +1,87 @@
+POST /api/carts – Create New Cart
+Purpose: Initialize a shopping cart
+Calls: None (pure DB operation)
+
+function createCart(userId) {
+  newCart = CartDB.create({
+    userId: userId,
+    items: [],
+    createdAt: now(),
+    expiresAt: userId ? null : now() + 30.days // Guest cart expiry
+  })
+  return newCart
+}
+
+GET /api/carts/{cartId} – Get Cart Contents
+Purpose: Retrieve cart with real-time product data
+Calls:
+- Product Service (for latest prices/details)
+- Inventory Service (stock check)
+
+function getCart(cartId) {
+  // 1. Get cart base data
+  cart = CartDB.get(cartId)
+  
+  // 2. Get product details for all items (call Product Service)
+  productIds = cart.items.map(i => i.productId)
+  products = ProductService.getBulkDetails(productIds)
+  
+  // 3. Check stock (call Inventory Service)
+  stockStatus = InventoryService.bulkCheckStock(productIds)
+
+  
+  // 5. Combine data
+  return {
+    ...cart,
+    items: cart.items.map(item => ({
+      ...item,
+      product: products[item.productId],
+      available: stockStatus[item.productId].inStock,
+      currentPrice: applyDiscount(
+        products[item.productId].price
+      )
+    })),
+    promotions: promotions.generalCartDiscounts
+  }
+}
+
+
+POST /api/carts/{cartId}/items – Add to Cart
+Purpose: Add/update items in cart
+Calls:
+- Product Service (validate product)
+- Inventory Service (stock check)
+
+function addCartItem(cartId, productId, quantity) {
+  // 1. Validate product exists (call Product Service)
+  if (!ProductService.exists(productId)) {
+    throw Error("Invalid product")
+  }
+  
+  // 2. Check available stock (call Inventory Service)
+  stock = InventoryService.getProductStock(productId)
+  if (stock.quantity < quantity) {
+    throw Error(`Only ${stock.quantity} available`)
+  }
+  
+  // 3. Add/update item in cart
+  updatedCart = CartDB.upsertItem(
+    cartId: cartId,
+    productId: productId,
+    quantity: quantity
+  )
+  
+  return updatedCart
+}
+
+DELETE /api/carts/{cartId}/items/{itemId} – Remove from Cart
+Purpose: Remove item from cart
+Calls: None
+
+function removeCartItem(cartId, itemId) {
+  return CartDB.removeItem(
+    cartId: cartId,
+    itemId: itemId
+  )
+}
+
