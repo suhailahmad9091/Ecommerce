@@ -1,0 +1,6 @@
+# Payment Routes
+
+Method         	Endpoint	                        Description
+POST	        /payments	                        Create a new payment
+GET	            /payments/{paymentId}	            Get specific payment details
+PUT	            /payments/{paymentId}/retry	        Retry a failed payment
