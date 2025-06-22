@@ -1,99 +1,98 @@
 # Submit a review and rating
-func SubmitReview():
-    // Step 1: Parse request body
-    if error while parsing:
-        return 400 Bad Request
+Function SubmitReview:
+    If request body is invalid:
+        Return HTTP 400 Bad Request with message "Invalid request body"
 
-    // Step 2: Validate rating and product_id
-    if invalid rating or missing product_id:
-        return 400 Invalid Input
+    If rating is invalid OR productID is missing:
+        Return HTTP 400 Bad Request with message "Invalid rating or product ID"
 
-    // Step 3: Insert review into reviews table
-    saveReview(userID, productID, rating, reviewText)
+    result = saveReview(userID, productID, rating, reviewText)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to submit review"
 
-    // Step 4: Return success response
-    return 201 Created with message "Review submitted"
+    Return HTTP 201 Created with message "Review submitted"
+
 
 
 
 
 
 # Get all reviews for a product
-func GetProductReviews(productID):
-    // Step 1: Validate productID
-    if invalid:
-        return 400 Bad Request
+Function GetProductReviews(productID):
+    If productID is invalid or missing:
+        Return HTTP 400 Bad Request with message "Invalid product ID"
 
-    // Step 2: Fetch reviews from DB
     reviews = fetchReviewsByProductID(productID)
+    If error while fetching:
+        Return HTTP 500 Internal Server Error with message "Failed to retrieve reviews"
 
-    // Step 3: Return reviews
-    return 200 OK with reviews
+    Return HTTP 200 OK with data: reviews
+
 
 
 
 
 
 # Get current user's reviews
-func GetUserReviews():
-    // Step 1: Extract userID from context
-    if userID missing:
-        return 401 Unauthorized
+Function GetUserReviews:
+    If userID is missing:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Fetch reviews from DB
     reviews = fetchReviewsByUserID(userID)
+    If error while fetching:
+        Return HTTP 500 Internal Server Error with message "Failed to retrieve user reviews"
 
-    // Step 3: Return user's reviews
-    return 200 OK with reviews
+    Return HTTP 200 OK with data: reviews
+
 
 
 
 
 
 # Update a review
-func UpdateReview(reviewID):
-    // Step 1: Parse request body
-    if error while parsing:
-        return 400 Bad Request
+Function UpdateReview(reviewID):
+    If request body is invalid:
+        Return HTTP 400 Bad Request with message "Invalid request body"
 
-    // Step 2: Fetch review and verify ownership
-        if review not found or userID mismatch:
-            return 403 Forbidden
+    review = fetchReviewByID(reviewID)
+    If review not found OR review.userID != currentUserID:
+        Return HTTP 403 Forbidden with message "Not authorized to update this review"
 
-    // Step 3: Update review in DB
-    updateReview(reviewID, newRating, newReviewText)
+    result = updateReview(reviewID, newRating, newReviewText)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to update review"
 
-    // Step 4: Return success response
-    return 200 OK with message "Review updated"
+    Return HTTP 200 OK with message "Review updated"
+
 
 
 
 
 
 # Delete a review
-func DeleteReview(reviewID):
-    // Step 1: Fetch review and verify ownership
-    if review not found or userID mismatch:
-        return 403 Forbidden
+Function DeleteReview(reviewID):
+    review = fetchReviewByID(reviewID)
+    If review not found OR review.userID != currentUserID:
+        Return HTTP 403 Forbidden with message "Not authorized to delete this review"
 
-    // Step 2: Delete review from DB
-    deleteReview(reviewID)
+    result = deleteReview(reviewID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to delete review"
 
-    // Step 3: Return success response
-    return 200 OK with message "Review deleted"
+    Return HTTP 200 OK with message "Review deleted"
+
 
 
 
 
 
 # Get average rating and count
-func GetProductRatingSummary(productID):
-    // Step 1: Validate productID
-    if invalid:
-        return 400 Bad Request
+Function GetProductRatingSummary(productID):
+    If productID is invalid or missing:
+        Return HTTP 400 Bad Request with message "Invalid product ID"
 
-    // Step 2: Aggregate average rating and count
     data = calculateAverageRating(productID)
+    If error while fetching data:
+        Return HTTP 500 Internal Server Error with message "Failed to calculate rating summary"
 
-    // Step 3: Return rating summary
-    return 200 OK with { average_rating, total_reviews }
+    Return HTTP 200 OK with data: { average_rating, total_reviews }

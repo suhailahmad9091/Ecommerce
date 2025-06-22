@@ -1,93 +1,90 @@
 # Send a notification to a user
-func SendNotification():
-    // Step 1: Parse request body
-    if error while parsing:
-        return 400 Bad Request
+Function SendNotification:
+    If request body is invalid:
+        Return HTTP 400 Bad Request with message "Invalid request body"
 
-    // Step 2: Validate input (user_id, type, message)
-    if missing required fields:
-        return 400 Invalid Input
+    If any required field is missing:
+        Return HTTP 400 Bad Request with message "Missing required fields"
 
-    // Step 3: Save notification in DB
-    saveNotification(userID, type, message)
+    result = saveNotification(userID, type, message)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to save notification"
 
-    // Step 4: publish Kafka event or trigger email/SMS
     publishEvent("notification.send", {
-            user_id: userID,
-            type: type,
-            message: message
-        })
+        user_id: userID,
+        type: type,
+        message: message
+    })
 
-    // Step 5: Return success response
-    return 201 Created with message "Notification sent"
+    Return HTTP 201 Created with message "Notification sent"
+
 
 
 
 
 # Get all notifications for current user
-func GetUserNotifications():
-    // Step 1: Extract userID from context
-    if userID missing:
-        return 401 Unauthorized
+Function GetUserNotifications:
+    If userID is missing:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Fetch notifications from DB
     notifications = fetchNotificationsByUserID(userID)
+    If error while fetching:
+        Return HTTP 500 Internal Server Error with message "Failed to retrieve notifications"
 
-    // Step 3: Return notifications
-    return 200 OK with notifications
+    Return HTTP 200 OK with data: notifications
+
 
 
 
 
 
 # Mark a notification as read
-func MarkNotificationAsRead(notificationID):
-    // Step 1: Extract userID from context
-    if userID missing:
-            return 401 Unauthorized
+Function MarkNotificationAsRead(notificationID):
+    If userID is missing:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Verify notification ownership
-    if not owned by user:
-        return 403 Forbidden
+    notification = fetchNotificationByID(notificationID)
+    If notification not found OR notification.userID != currentUserID:
+        Return HTTP 403 Forbidden with message "Not authorized to modify this notification"
 
-    // Step 3: Update notification status
-    markAsRead(notificationID)
+    result = markAsRead(notificationID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to mark as read"
 
-    // Step 4: Return success response
-    return 200 OK with message "Notification marked as read"
+    Return HTTP 200 OK with message "Notification marked as read"
+
 
 
 
 
 
 # Delete a notification
-func DeleteNotification(notificationID):
-    // Step 1: Extract userID from context
-    if userID missing:
-            return 401 Unauthorized
+Function DeleteNotification(notificationID):
+    If userID is missing:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Verify notification ownership
-    if not owned by user:
-        return 403 Forbidden
+    notification = fetchNotificationByID(notificationID)
+    If notification not found OR notification.userID != currentUserID:
+        Return HTTP 403 Forbidden with message "Not authorized to delete this notification"
 
-    // Step 3: Delete notification from DB
-    deleteNotification(notificationID)
+    result = deleteNotification(notificationID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to delete notification"
 
-    // Step 4: Return success response
-    return 200 OK with message "Notification deleted"
+    Return HTTP 200 OK with message "Notification deleted"
+
 
 
 
 
 
 # Clear all notifications for user
-func ClearNotifications():
-    // Step 1: Extract userID from context
-    if userID missing:
-            return 401 Unauthorized
+Function ClearNotifications:
+    If userID is missing:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Delete all notifications where user_id = userID
-    clearNotificationsByUser(userID)
+    result = clearNotificationsByUser(userID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to clear notifications"
 
-    // Step 3: Return success response
-    return 200 OK with message "All notifications cleared"
+    Return HTTP 200 OK with message "All notifications cleared"

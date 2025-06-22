@@ -1,41 +1,72 @@
 # Create a new payment
-func CreatePayment(orderID, userID):
-    // Step 1: Validate payment method, amount, etc.
-    if !validPaymentData():
-        return 400 Bad Request
+Function CreatePayment(orderID, userID):
+    If not validPaymentData(orderID, userID):
+        Return HTTP 400 Bad Request with message "Invalid payment data"
 
-    // Step 2: Create the payment record with "initiated" status
-    paymentID = createPayment(orderID, userID, "initiated")
+    paymentID = createPayment(orderID, userID, status = "initiated")
+    If paymentID is null:
+        Return HTTP 500 Internal Server Error with message "Failed to create payment"
 
-    // Step 4: Initiate transaction with payment gateway
-    triggerPaymentGateway(paymentID)
+    result = triggerPaymentGateway(paymentID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Payment gateway initiation failed"
 
-    // Step 5: Return success response
-    return 201 Created with paymentID
+    Return HTTP 201 Created with data: { payment_id: paymentID }
+
 
 
 
 
 
 # Get specific payment details
-func GetPaymentByID(paymentID):
-    // Step 1: Fetch payment details using paymentID
+Function GetPaymentByID(paymentID):
+    payment = fetchPaymentByID(paymentID)
+    If payment not found:
+        Return HTTP 404 Not Found with message "Payment not found"
 
-    // Step 2: Return payment details
-    return 200 OK with payment
+    Return HTTP 200 OK with data: payment
+
 
 
 
 
 
 # Retry a failed payment
-func RetryPayment(paymentID):
-    // Step 1: Check payment status is "failed"
-    if not isFailed(paymentID):
-        return 400 Bad Request
+Function RetryPayment(paymentID):
+    payment = fetchPaymentByID(paymentID)
+    If payment not found:
+        Return HTTP 404 Not Found with message "Payment not found"
 
-    // Step 2: Trigger payment retry logic
-    triggerPaymentGateway(paymentID)
+    If payment.status != "failed":
+        Return HTTP 400 Bad Request with message "Only failed payments can be retried"
 
-    // Step 3: Return response
-    return 200 OK with message "Retry initiated"
+    result = triggerPaymentGateway(paymentID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Retry failed"
+
+    Return HTTP 200 OK with message "Retry initiated"
+
+
+
+
+
+
+# Refund a payment
+Function RefundPayment(paymentID):
+    payment = fetchPaymentByID(paymentID)
+    If payment not found:
+        Return HTTP 404 Not Found with message "Payment not found"
+
+    If payment.status != "successful":
+        Return HTTP 400 Bad Request with message "Only successful payments can be refunded"
+
+    If payment.refundStatus == "refunded":
+        Return HTTP 400 Bad Request with message "Payment already refunded"
+
+    result = triggerRefundGateway(paymentID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Refund failed"
+
+    updateRefundStatus(paymentID, "refunded")
+
+    Return HTTP 200 OK with message "Refund processed successfully"

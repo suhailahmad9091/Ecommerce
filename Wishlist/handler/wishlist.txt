@@ -1,58 +1,57 @@
 # Add products to wishlist
-func AddToWishlist():
-    // Step 1: Parse request body
-    if error while parsing:
-        return 400 Bad Request
+Function AddToWishlist:
+    If request body is invalid:
+        Return HTTP 400 Bad Request with message "Invalid request"
 
-    // Step 2: Add to wishlist table
-    saveWishlist(userID, productID)
+    result = saveWishlist(userID, productID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to add to wishlist"
 
-    // Step 3: Return success response
-    return 201 Created with message "Added to wishlist"
+    Return HTTP 201 Created with message "Added to wishlist"
+
 
 
 
 
 
 # Get current user’s wishlist
-func GetWishlist():
-    // Step 1: Extract userID from context
-    if userID not found:
-        return 401 Unauthorized
+Function GetWishlist:
+    If userID is not found:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Fetch wishlist items for userID
-    wishlist = fetchWishlistByUserID(userID)
+    wishlistItems = fetchWishlistByUserID(userID)
+    If error while fetching:
+        Return HTTP 500 Internal Server Error with message "Failed to retrieve wishlist"
 
-    // Step 3: Return wishlist data
-    return 200 OK with wishlist
+    Return HTTP 200 OK with data: wishlistItems
+
 
 
 
 
 # Remove product from wishlist
-func RemoveFromWishlist(productID):
-    // Step 1: Extract userID from context
-    if userID not found:
-        return 401 Unauthorized
+Function RemoveFromWishlist(productID):
+    If userID is not found:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Delete product from wishlist table
-    deleteWishlistItem(userID, productID)
+    result = deleteWishlistItem(userID, productID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to remove item from wishlist"
 
-    // Step 3: Return success response
-    return 200 OK with message "Item removed from wishlist"
+    Return HTTP 200 OK with message "Item removed from wishlist"
+
 
 
 
 
 
 # Delete all items from wishlist
-func ClearWishlist():
-    // Step 1: Extract userID from context
-    if userID not found:
-        return 401 Unauthorized
+Function ClearWishlist:
+    If userID is not found:
+        Return HTTP 401 Unauthorized with message "User not authenticated"
 
-    // Step 2: Delete all wishlist items for userID
-    clearWishlistByUserID(userID)
+    result = clearWishlistByUserID(userID)
+    If result is error:
+        Return HTTP 500 Internal Server Error with message "Failed to clear wishlist"
 
-    // Step 3: Return success response
-    return 200 OK with message "Wishlist cleared"
+    Return HTTP 200 OK with message "Wishlist cleared"
